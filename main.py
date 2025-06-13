@@ -1,4 +1,5 @@
-# # You will create a fastapi application for Bank Account Managament.
+# 1dalis
+#  # You will create a fastapi application for Bank Account Managament.
 
 # 1. Create a Github repo for this project.
 # 2. Create a separate folder for project.
@@ -12,9 +13,21 @@
 
 # ---------------------------------------------------
 
+# 2dalis
 
+# The product owner has requested additional functionality to be able to create payments:
 
-# a fastapi system for account managament
+# 1. Payment resource will have:
+#  - id: int
+#  - from_account_id: int (account id from which we are sending from)
+#  - to_account_id: int (account id from which we are sending to)
+#  - amount_in_euros: int
+#  - payment_date: date
+
+# 2. Create this resource and add create, get_all, get_by_id methods.
+
+# Optional, advanced
+# - Please check if the accounts are valid and the sum is more than 0, if not return 400.
 
 from fastapi import FastAPI
 from pydantic import BaseModel
