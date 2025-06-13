@@ -40,8 +40,17 @@ class Account(BaseModel):
     person_name: str
     address: str
 
+class Payment(BaseModel):
+    id: int
+    from_account_id: int
+    to_account_id: int
+    amount_in_euros: float
+    payment_date: str  # Using string for date, can be improved with datetime    
+
 # type hint for a list of accounts
 accounts:list[Account] = []
+
+payments:list[Payment] = []
 
 @app.post("/accounts/")
 def create_account(account: Account):
@@ -63,3 +72,31 @@ def get_account(account_id: int):
 def delete_account(account_id: int):
     accounts[:] = [account for account in accounts if account.id != account_id]
     return {"message": "Account deleted successfully"}
+
+
+
+@app.post("/payments/")
+def create_payment(payment: Payment):
+    # Check if accounts are valid
+    from_account = next((acc for acc in accounts if acc.id == payment.from_account_id), None)
+    to_account = next((acc for acc in accounts if acc.id == payment.to_account_id), None)
+    
+    if not from_account or not to_account:
+        return {"message": "Invalid account(s)"}, 400
+    
+    if payment.amount_in_euros <= 0:
+        return {"message": "Amount must be greater than 0"}, 400
+    
+    payments.append(payment)
+    return {"message": "Payment created successfully"}
+
+@app.get("/payments/")
+def get_payments():
+    return payments
+
+@app.get("/payments/{payment_id}")
+def get_payment(payment_id: int):
+    for payment in payments:
+        if payment.id == payment_id:
+            return payment
+    return {"message": "Payment not found"}
