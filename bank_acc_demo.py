@@ -50,8 +50,11 @@ def read_accounts_from_file():
     accounts = []
     with open("accounts.txt", "r") as file:
         for line in file:
-            id, type, person_name, address = line.strip().split(",")
-            accounts.append(Account(id=int(id), type=type, person_name=person_name, address=address))
+            parts = line.strip().split(",")
+            if len(parts) == 10:
+                id, type, person_name, address = parts
+                accounts.append(Account(id=int(id), type=type.strip(), person_name=person_name.strip(), address=address.strip()))
+    return accounts
 
             
 class Payment(BaseModel):
@@ -110,6 +113,7 @@ def delete_account(account_id: int):
 
 @app.post("/payments/")
 def create_payment(payment: Payment):
+    write_payment_to_file(payment)
     # Check if accounts are valid
     from_account = next((acc for acc in accounts if acc.id == payment.from_account_id), None)
     to_account = next((acc for acc in accounts if acc.id == payment.to_account_id), None)
