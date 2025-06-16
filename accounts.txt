@@ -1,0 +1,6 @@
+1, personal, josh, liepu
+2, business, john, Alyvu
+3, private, Donald, Taikos
+3, private, Donald, Taikos
+4, private, Daniel, pievu
+

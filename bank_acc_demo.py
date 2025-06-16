@@ -40,21 +40,54 @@ class Account(BaseModel):
     person_name: str
     address: str
 
+# Account file operations
+
+def write_account_to_file(accounts: Account):
+    with open("accounts.txt", "a") as file:
+        file.write(f"{accounts.id}, {accounts.type}, {accounts.person_name}, {accounts.address}\n")
+
+def read_accounts_from_file():
+    accounts = []
+    with open("accounts.txt", "r") as file:
+        for line in file:
+            id, type, person_name, address = line.strip().split(",")
+            accounts.append(Account(id=int(id), type=type, person_name=person_name, address=address))
+
+            
 class Payment(BaseModel):
     id: int
     from_account_id: int
     to_account_id: int
     amount_in_euros: float
-    payment_date: str  # Using string for date, can be improved with datetime    
+    payment_date: str  
+    
+def write_payment_to_file(payments: Payment):
+    with open("payments.txt", "a") as file:
+        file.write(f"{payments.id}, {payments.from_account_id}, {payments.to_account_id}, {payments.amount_in_euros}, {payments.payment_date}\n")
+    
+def read_payments_from_file():
+    payments = []
+    with open("payments.txt", "r") as file:
+        for line in file:
+            id, from_account_id, to_account_id, amount, date = line.strip().split(",")
+            payments.append(Payment(
+                id=int(id),
+                from_account_id=int(from_account_id),
+                to_account_id=int(to_account_id),
+                amount_in_euros=float(amount),
+                payment_date=date
+            ))
+    return payments
 
 # type hint for a list of accounts
-accounts:list[Account] = []
+accounts:list[Account] = read_accounts_from_file()
 
-payments:list[Payment] = []
+payments:list[Payment] = read_payments_from_file()
 
 @app.post("/accounts/")
 def create_account(account: Account):
-    accounts.append(account)
+   
+    write_account_to_file(account)
     return {"message": "Account created successfully"}
 
 @app.get("/accounts/")
