@@ -29,8 +29,25 @@
 # Optional, advanced
 # - Please check if the accounts are valid and the sum is more than 0, if not return 400.
 
+# 3 dalis
+
+#Please create an endpoint for reporting.
+
+#This report should return a list of all transactions in the following format in json:
+#  - from_person_name
+#  - to_person_name
+#  - amount_in_euros
+#  - payment
+
+#This endpoint should return an array of jsons with the information above.
+#The endpoint should be GET /report 
+
 from fastapi import FastAPI
 from pydantic import BaseModel
+
+from fastapi.responses import FileResponse
+import json
+
 
 app = FastAPI()
 
@@ -56,12 +73,13 @@ def read_accounts_from_file():
                 accounts.append(Account(id=int(id), type=type.strip(), person_name=person_name.strip(), address=address.strip()))
     return accounts
 
+
             
 class Payment(BaseModel):
     id: int
     from_account_id: int
     to_account_id: int
-    amount_in_euros: float
+    amount_in_euros: int
     payment_date: str  
     
 def write_payment_to_file(payments: Payment):
@@ -82,10 +100,57 @@ def read_payments_from_file():
             ))
     return payments
 
+class ReportRow(BaseModel):
+    from_person_name: str
+    to_person_name: str
+    amount_in_euros: float
+    payment_date: str 
+
+
+
+def report():
+    
+    report = []
+    accounts = read_accounts_from_file()
+    payments = read_payments_from_file()
+    
+    for payment in payments:
+        from_account = next((acc for acc in accounts if acc.id == payment.from_account_id), None)
+        to_account = next((acc for acc in accounts if acc.id == payment.to_account_id), None)
+
+        if from_account and to_account:
+            report.append({
+                "from_person_name": from_account.person_name,
+                "to_person_name": to_account.person_name,
+                "amount_in_euros": payment.amount_in_euros,
+                "payment_date": payment.payment_date
+            })
+
+    with open("report.json", "w", encoding="utf-8") as f:
+        json.dump(report, f, indent=4, ensure_ascii=False) 
+
+    return report
+
+
+
+
+
+
+
+
+
+
+
+
+
 # type hint for a list of accounts
 accounts:list[Account] = read_accounts_from_file()
 
 payments:list[Payment] = read_payments_from_file()
+
+
+
+
 
 @app.post("/accounts/")
 def create_account(account: Account):
@@ -137,3 +202,11 @@ def get_payment(payment_id: int):
         if payment.id == payment_id:
             return payment
     return {"message": "Payment not found"}
+
+@app.get("/report/")
+def get_report_json():
+    return report()
+
+
+
+

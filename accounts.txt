@@ -5,3 +5,5 @@
 4, private, Daniel, pievu
 
 5, bussines, Adele, Azuolyno
+6, bussines, Andrius, Tuopu
+7, privte, Elen, 06 28

@@ -1,0 +1,20 @@
+accounts = read_from_file('accounts.txt')
+ 
+payments = read_from_file('payments.txt')
+ 
+class PaymentReportRow:
+    account_from_name: str
+    account_to_name: str
+ 
+report_rows = []
+for payment in payments:
+    from_account = next((a for a in accounts if a['id'] == payment['from_account_id']), None)
+    to_account = next((a for a in accounts if a['id'] == payment['to_account_id']), None)
+ 
+    payment_row = PaymentReportRow(
+        from_account = from_account,
+        to_account = to_account,
+    )
+ 
+    report_rows.append(payment_row)
+ 
